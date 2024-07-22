@@ -916,3 +916,94 @@ class QuestionDetailViewTests(TestCase):
         self.assertContains(response, past_question.question_text)
 
 ```
+
+## Parte 6 archivos estaticos
+
+Implementacion de archivos css y imagenes
+
+- Configurar estaticos 
+
+Directorio: mysite/settings.py
+```
+import os
+
+....
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+```
+
+- Crear directorio de estaticos
+
+Directorio: mysite/static
+Sub-Directorio 1: mysite/static/img
+Sub-Directorio 2: mysite/static/css
+
+- Crear archivos estaticos
+
+Directorio 1: mysite/static/img/fondo.png
+![img.png](static/img/fondo.png)
+
+Directorio 2: mysite/static/css/style.css
+```
+li a {
+    color: green;
+}
+```
+
+- Implementar estaticos en un template
+```
+{% load static %}
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <title>Tutorial Django</title>
+</head>
+<body>
+    {% if latest_question_list %}
+        <ul>
+            {% for question in latest_question_list %}
+                {# <li><a href="/polls/{{ question.id }}/">{{ question.question_text }}</a></li>#}
+                <li><a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a></li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No polls are available.</p>
+    {% endif %}
+</body>
+</html>
+
+```
+
+- Implementar estaticos en un archivo css
+
+Directorio: mysite/static/css/style.css
+```
+ul{
+    padding: 40px;
+    margin: 100px;
+    background-color: #ffffff;
+    border-radius: 10px;
+}
+
+li a {
+    background-color: #ffffff;
+    color: green;
+}
+
+body {
+    height: 100vh;
+    background: white url("../img/fondo.png") ;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+```

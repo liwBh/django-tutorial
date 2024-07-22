@@ -1,0 +1,19 @@
+ul{
+    padding: 40px;
+    margin: 100px;
+    background-color: #ffffff;
+    border-radius: 10px;
+}
+
+li a {
+    background-color: #ffffff;
+    color: green;
+}
+
+body {
+    height: 100vh;
+    background: white url("../img/fondo.png") ;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
