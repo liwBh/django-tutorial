@@ -154,11 +154,11 @@ En el directorio mencionado almacenará las migraciones
 
 - Ingresar al shell para manipular bd
 
-```
-    python manage.py shell
-```
+    ```
+        python manage.py shell
+    ```
 
-    - Indicar las tablas 
+   - Indicar las tablas 
     ```
         from polls.models import Choice, Question
     ```
