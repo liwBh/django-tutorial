@@ -277,8 +277,210 @@ python manage.py createsuperuser
 ```
 Es necesario agregar un user name, correo y contraseña
 - Acceder con el usuario administrador creado
+
 URL: http://localhost:8000/admin/
 
 ![img.png](static/img/img-3.png)
 
-![img.png](static/img/img-3.png)
+![img.png](static/img/img-4.png)
+
+- Agregar myapp a panel de admin
+
+Directorio: polls/admin.py
+
+```
+from django.contrib import admin
+
+from .models import Question
+
+admin.site.register(Question)
+```
+
+## Parte 3 Vistas y rutas
+
+- Nuevas vistas y parametros en la url
+
+Directorio: polls/views.py
+```
+def detail(request, question_id):
+    return HttpResponse("You're looking at question %s." % question_id)
+
+
+def results(request, question_id):
+    response = "You're looking at the results of question %s."
+    return HttpResponse(response % question_id)
+
+
+def vote(request, question_id):
+    return HttpResponse("You're voting on question %s." % question_id)
+```
+
+Directorio: polls/urls.py
+```
+from django.urls import path
+
+from . import views
+
+urlpatterns = [
+    # ex: /polls/
+    path("", views.index, name="index"),
+    # ex: /polls/5/
+    path("<int:question_id>/", views.detail, name="detail"),
+    # ex: /polls/5/results/
+    path("<int:question_id>/results/", views.results, name="results"),
+    # ex: /polls/5/vote/
+    path("<int:question_id>/vote/", views.vote, name="vote"),
+]
+```
+Nuevas urls:
+  - http://localhost:8000/polls/1/
+  - http://localhost:8000/polls/1/results/
+  - http://localhost:8000/polls/1/vote/
+
+- Modificar la vista principal de polls
+
+Directorio: http://localhost:8000/polls/
+En esta vista listaremos las preguntas y las agregaremos a la interfaz
+
+```
+from django.http import HttpResponse
+
+from .models import Question
+
+
+def index(request):
+    latest_question_list = Question.objects.order_by("-pub_date")[:5]
+    output = ", ".join([q.question_text for q in latest_question_list])
+    return HttpResponse(output)
+```
+
+- Crear una plantilla html 
+
+Directorio: /templates/polls/index.html
+```
+{% if latest_question_list %}
+    <ul>
+    {% for question in latest_question_list %}
+        <li><a href="/polls/{{ question.id }}/">{{ question.question_text }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No polls are available.</p>
+{% endif %}
+```
+- Implementar la plantilla en la vista
+
+Directorio: polls/views.py
+```
+from django.http import HttpResponse
+from django.template import loader
+
+from .models import Question
+
+
+def index(request):
+    latest_question_list = Question.objects.order_by("-pub_date")[:5]
+    # Obtener template
+    template = loader.get_template("polls/index.html")
+    # Pasar datos a la vista
+    context = {
+        "latest_question_list": latest_question_list,
+    }
+    # Retornar la vista con los datos
+    return HttpResponse(template.render(context, request))
+```
+- Simplificar el codigo con render()
+
+Directorio: polls/views.py
+```
+from django.shortcuts import render
+
+from .models import Question
+
+
+def index(request):
+    latest_question_list = Question.objects.order_by("-pub_date")[:5]
+    context = {"latest_question_list": latest_question_list}
+    return render(request, "polls/index.html", context)
+```
+
+- Modificar vista de detalle y agregar template con excepciones
+
+Directorio: polls/views.py
+```
+from django.http import Http404
+from django.shortcuts import render
+from .models import Question
+
+
+# ...
+def detail(request, question_id):
+    try:
+        question = Question.objects.get(pk=question_id)
+    except Question.DoesNotExist:
+        raise Http404("Question does not exist")
+    return render(request, "polls/detail.html", {"question": question})
+```
+- Simplificar el codigo de pagina detalle 
+
+Directorio: polls/views.py
+```
+from django.shortcuts import get_object_or_404, render
+
+from .models import Question
+
+
+# ...
+def detail(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+    return render(request, "polls/detail.html", {"question": question})
+```
+
+- Modificar el template de detalle
+
+Directorio: template/polls/detail.html
+
+Accerder a datos para mostrarlos en la vista
+```
+<h1>{{ question.question_text }}</h1>
+<ul>
+{% for choice in question.choice_set.all %}
+    <li>{{ choice.choice_text }}</li>
+{% endfor %}
+</ul>
+```
+
+- Modificar el template de index cambiar la forma de uso de urls
+
+Directorio: template/polls/index.html
+
+Se utiliza el name unico para identificar la url
+```
+<h1>{{ question.question_text }}</h1>
+<ul>
+{% for choice in question.choice_set.all %}
+   <li><a href="{% url 'detail' question.id %}">{{ question.question_text }}</a></li>
+{% endfor %}
+</ul>
+```
+
+- Evitar conflitos por nombres de url
+
+Directorio: polls/urls.py
+```
+from django.urls import path
+
+from . import views
+
+app_name = "polls"
+urlpatterns = [
+    path("", views.index, name="index"),
+    path("<int:question_id>/", views.detail, name="detail"),
+    path("<int:question_id>/results/", views.results, name="results"),
+    path("<int:question_id>/vote/", views.vote, name="vote"),
+]
+```
+Para ello se agrega un nombre a la app
+```
+<li><a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a></li>
+```
