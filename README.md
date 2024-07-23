@@ -7,6 +7,9 @@ Es un resumen del ["tutorial oficial"](https://docs.djangoproject.com/en/5.0/) d
 * [Parte 3 Vistas y rutas](#parte-3-vistas-y-rutas)
 * [Parte 4 Implementación de interación con la pagina y datos en bd](#parte-4-implementación-de-interación-con-la-pagina-y-datos-en-bd)
 * [Parte 5 Pruebas automatizadas](#parte-5-pruebas-automatizadas)
+* [Parte 6 Archivos estaticos](#parte-6-archivos-estaticos)
+* [Parte 7 Personalizar formulario de administración](#parte-7-personalizar-formulario-de-administración)
+* [Extras](#extras)
 
 
 
@@ -917,7 +920,7 @@ class QuestionDetailViewTests(TestCase):
 
 ```
 
-## Parte 6 archivos estaticos
+## Parte 6 Archivos estaticos
 
 Implementacion de archivos css y imagenes
 
@@ -1007,3 +1010,289 @@ body {
     background-repeat: no-repeat;
 }
 ```
+ 
+
+## Parte 7 Personalizar panel de administración
+
+- Modificar el panel de administracion de nuestra app
+
+Directorio: polls/admin.py
+URL: http://localhost:8000/admin/polls/question/
+```
+from django.contrib import admin
+
+from .models import Question
+
+
+class QuestionAdmin(admin.ModelAdmin):
+    fieldsets = [
+        ("Name", {"fields": ["question_text"]}),
+        ("Date information", {"fields": ["pub_date"]}),
+    ]
+
+
+admin.site.register(Question, QuestionAdmin)
+```
+- Agregar objetos relacionados
+
+Con esta modificacion las opciones de la encuesta se integran dentro de la vista principal de encuestas
+```
+from django.contrib import admin
+from .models import Choice, Question
+
+class ChoiceInline(admin.StackedInline):
+    model = Choice
+    extra = 1
+    
+class QuestionAdmin(admin.ModelAdmin):
+    fieldsets = [
+        ("Name", {"fields": ["question_text"]}),
+        ("Date information", {"fields": ["pub_date"]}),
+    ]
+    inlines = [ChoiceInline]
+
+
+admin.site.register(Question, QuestionAdmin)
+```
+
+- Modificar el formulario de los objetos relacionados
+
+![img.png](static/img/img-9.png)
+Con eso TabularInline (en lugar de StackedInline), el los objetos relacionados se muestran en un formato más compacto basado en tablas:
+```
+from django.contrib import admin
+from .models import Choice, Question
+
+class ChoiceInline(admin.TabularInline):
+    model = Choice
+    extra = 1
+
+
+class QuestionAdmin(admin.ModelAdmin):
+    fieldsets = [
+        ("Name", {"fields": ["question_text"]}),
+        ("Date information", {"fields": ["pub_date"]}),
+    ]
+    inlines = [ChoiceInline]
+
+admin.site.register(Question, QuestionAdmin)
+```
+![img.png](static/img/img-8.png)
+
+- Personalizar la lista de encuestas
+
+```
+from django.contrib import admin
+from .models import Choice, Question
+
+class ChoiceInline(admin.TabularInline):
+    model = Choice
+    extra = 1
+
+
+class QuestionAdmin(admin.ModelAdmin):
+    fieldsets = [
+        ("Name", {"fields": ["question_text"]}),
+        ("Date information", {"fields": ["pub_date"]}),
+    ]
+    inlines = [ChoiceInline]
+    list_display = ["question_text", "pub_date", "was_published_recently"]
+
+admin.site.register(Question, QuestionAdmin)
+```
+
+- Agregar un decorador al model que sera visible en el panel de admin lista de encuenstas
+![img.png](static/img/img-7.png)
+```
+import datetime
+
+from django.db import models
+from django.utils import timezone
+from django.contrib import admin
+
+class Question(models.Model):
+    question_text = models.CharField(max_length=200)
+    pub_date = models.DateTimeField("date published")
+
+    def __str__(self):
+        return self.question_text
+        
+    @admin.display(
+        boolean=True,
+        ordering="pub_date",
+        description="Published recently?",
+    )
+    def was_published_recently(self):
+        now = timezone.now()
+        return now - datetime.timedelta(days=1) <= self.pub_date <= now
+
+
+class Choice(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    choice_text = models.CharField(max_length=200)
+    votes = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.choice_text
+```
+![img.png](static/img/img-6.png)
+
+- Agregar un filtros
+```
+from django.contrib import admin
+from .models import Choice, Question
+
+class ChoiceInline(admin.TabularInline):
+    model = Choice
+    extra = 1
+
+
+class QuestionAdmin(admin.ModelAdmin):
+    fieldsets = [
+        ("Name", {"fields": ["question_text"]}),
+        ("Date information", {"fields": ["pub_date"]}),
+    ]
+    inlines = [ChoiceInline]
+    list_display = ["question_text", "pub_date", "was_published_recently"]
+    list_filter = ["pub_date"]
+
+admin.site.register(Question, QuestionAdmin)
+```
+![img.png](static/img/img-10.png)
+
+- Agregar un buscador
+```
+from django.contrib import admin
+from .models import Choice, Question
+
+class ChoiceInline(admin.TabularInline):
+    model = Choice
+    extra = 1
+
+
+class QuestionAdmin(admin.ModelAdmin):
+    fieldsets = [
+        ("Name", {"fields": ["question_text"]}),
+        ("Date information", {"fields": ["pub_date"]}),
+    ]
+    inlines = [ChoiceInline]
+    list_display = ["question_text", "pub_date", "was_published_recently"]
+    list_filter = ["pub_date"]
+    search_fields = ["question_text"]
+
+admin.site.register(Question, QuestionAdmin)
+```
+![img.png](static/img/img-11.png)
+
+- Modificar el titulo del panel de admin
+
+![img.png](static/img/img-12.png)
+Primero debemos crear el directorio templates/admin
+Luego el archivo base_site.html dentro del directorio templates/admin/base_site.html
+
+Agregamos el codigo 
+```
+{% extends "admin/base_site.html" %}
+
+{% block branding %}
+<div id="site-name"><a href="{% url 'admin:index' %}">Polls Administration</a></div>
+{% if user.is_anonymous %}
+  {% include "admin/color_theme_toggle.html" %}
+{% endif %}
+{% endblock %}
+```
+El cual extiende de la plantilla base de django panel admin y modificamos el titulo,
+tambien se puede personalizar otros aspectos
+
+![img.png](static/img/img-13.png)
+
+## Extras
+- Agregar una vista principal
+
+Primero creamos un archivo index.html en la carpeta templates
+Directorio: mysite/templates/index
+
+Agregamos el codigo html de la vista, para facilitar laexploracion de la aplicación
+
+```
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <title>Tutorial django</title>
+</head>
+<body>
+    
+    <div class="container">
+        <h1>Tutorial Django</h1>
+         
+        <div class="router">
+            <a href="{% url 'polls:index' %}">Polls Home</a>
+            <a href="{% url 'admin:index' %}">Polls Administration</a>
+        </div>
+    </div>
+   
+</body>
+</html>
+```
+
+Modificamos el css
+```
+ul{
+    padding: 40px;
+    margin: 100px;
+    background-color: #ffffff;
+    border-radius: 10px;
+}
+
+li a {
+    background-color: #ffffff;
+    color: green;
+}
+
+body {
+    height: 100vh;
+    background: white url("../img/fondo.png") ;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.container{
+    width: 80%;
+    margin: 0 auto;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.container h1{
+    text-align: center;
+    margin-bottom: 40px;
+    color: #ffffff;
+}
+
+.router{
+    margin-bottom: 20px;
+    padding: 50px;
+    background-color: #333333;
+    color: #ffffff;
+    border-radius: 5px;
+    text-align: center;
+    max-width: 300px;
+    width: 100%;
+}
+.container a{
+    display: block;
+    color: #ffffff;
+    margin: 5px;
+}
+```
+![img.png](img-14.png)
