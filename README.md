@@ -297,9 +297,11 @@ Es necesario agregar un user name, correo y contraseña
 
 URL: http://localhost:8000/admin/
 
+![img.png](static/img/img-4.png)
+
 ![img.png](static/img/img-3.png)
 
-![img.png](static/img/img-4.png)
+
 
 - Agregar myapp a panel de admin
 
@@ -1265,11 +1267,6 @@ INTERNAL_IPS = [
     '127.0.0.1:8001',
 ]
 ```
-
-- Activar modo debug
-![img.png](static/img/img-16.png)
-
-Se activa al darle click al botón del escarabajo 
 
 URL: http://localhost:8000/
 ![img.png](static/img/img-15.png)
