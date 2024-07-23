@@ -19,6 +19,8 @@ Es un resumen del ["tutorial oficial"](https://docs.djangoproject.com/en/5.0/) d
 
 ## Parte 1 creando aplicacion en Django
 
+["Parte 1 Tutorial Django"](https://docs.djangoproject.com/en/5.0/intro/tutorial01/)
+
 - Instalación de python
 - Crear proyecto
 
@@ -113,6 +115,8 @@ url: http://localhost:8000/polls/
 ![img.png](static/img/img.png)
 
 ## Parte 2 Configuración de base de datos
+
+["Parte 2 Tutorial Django"](https://docs.djangoproject.com/en/5.0/intro/tutorial02/)
 
 Por defecto django tiene integrado la base de datos sqlite
 ![img.png](static/img/img-1.png)
@@ -317,6 +321,8 @@ admin.site.register(Question)
 
 ## Parte 3 Vistas y rutas
 
+["Parte 3 Tutorial Django"](https://docs.djangoproject.com/en/5.0/intro/tutorial03/)
+
 - Nuevas vistas y parametros en la url
 
 Directorio: polls/views.py
@@ -506,6 +512,8 @@ Para ello se agrega un nombre a la app
 
 ## Parte 4 Implementación de interación con la pagina y datos en bd
 
+["Parte 4 Tutorial Django"](https://docs.djangoproject.com/en/5.0/intro/tutorial04/)
+
 - Actualización de la pagina detail
 
 Directorio: template/polls/detail.html
@@ -640,6 +648,9 @@ def vote(request, question_id):
 ```
 
 ## Parte 5 Pruebas automatizadas
+
+["Parte 5 Tutorial Django"](https://docs.djangoproject.com/en/5.0/intro/tutorial05/)
+
 El fin de las pruebas automatizadas es identificar errores y prevenirlos.
 La app creada polls tiene un error el cual sera estudiado para luego hacer una prueba
 
@@ -928,6 +939,8 @@ class QuestionDetailViewTests(TestCase):
 
 ## Parte 6 Archivos estaticos
 
+["Parte 6 Tutorial Django"](https://docs.djangoproject.com/en/5.0/intro/tutorial06/)
+
 Implementacion de archivos css y imagenes
 
 - Configurar estaticos 
@@ -1018,6 +1031,8 @@ body {
 ```
 
 ## Parte 7 Personalizar panel de administración
+
+["Parte 7 Tutorial Django"](https://docs.djangoproject.com/en/5.0/intro/tutorial07/)
 
 - Modificar el panel de administracion de nuestra app
 
@@ -1213,6 +1228,8 @@ tambien se puede personalizar otros aspectos
 
 ## Parte 8 Debug Toolbar
 
+["Parte 8 Tutorial Django"](https://docs.djangoproject.com/en/5.0/intro/tutorial08/)
+
 - Instalación de Debug Toolbar
 ```
 python -m pip install django-debug-toolbar
@@ -1271,7 +1288,9 @@ INTERNAL_IPS = [
 URL: http://localhost:8000/
 ![img.png](static/img/img-15.png)
 
-## Tutorial avanzado: Crear aplicaciones reutilizables
+##  Crear aplicaciones reutilizables
+
+["Tutorial avanzado Django"](https://docs.djangoproject.com/en/5.0/intro/reusable-apps/)
 
 ## Obtener ayuda de otros
 
