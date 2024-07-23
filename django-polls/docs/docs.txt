@@ -1,0 +1,43 @@
+Instalación como biblioteca de usuarios
+
+Los siguientes pasos se instalan django-polls como biblioteca de usuarios.
+Por usuario las instalaciones tienen muchas ventajas sobre la instalación del
+paquete en todo el sistema, como ser utilizable en sistemas donde no tiene acceso
+de administrador además de evitar que el paquete afecte a los servicios del sistema
+y otros usuarios de la máquina.
+
+Tenga en cuenta que las instalaciones por usuario aún pueden afectar el comportamiento
+del sistema herramientas que se ejecutan como ese usuario, por lo que usar un entorno
+virtual es más robusto solución (ver más abajo).
+
+Para instalar el paquete, use pip (ya está lo instaló, verdad?):
+
+python -m pip install --user django-polls/dist/django-polls-0.1.tar.gz
+Actualizar mysite/settings.py para señalar el nuevo nombre del módulo:
+
+INSTALLED_APPS = [
+    "django_polls.apps.PollsConfig",
+    ...,
+]
+Actualizar mysite/urls.py para señalar el nuevo nombre del módulo:
+
+urlpatterns = [
+    path("polls/", include("django_polls.urls")),
+    ...,
+]
+Run the development server to confirm the project continues to work.
+
+Publicando tu aplicación¶
+Ahora que hemos empaquetado y probado django-polls, its listo para compartir con ¡el mundo!
+Si esto no fuera solo un ejemplo, ahora podrías:
+
+Envíe el paquete por correo electrónico a un amigo.
+Sube el paquete en tu sitio web.
+Publicar el paquete en un repositorio público, como el Índice de paquetes de Python (Pip).
+embalaje.python.org tiene un bien tutorial por hacer esto.
+
+Indice de paquetes python: https://pypi.org/
+
+Tutoriales uso de paquetes: https://packaging.python.org/en/latest/
+
+Tutorial subir un paquete: https://packaging.python.org/en/latest/tutorials/packaging-projects/#uploading-the-distribution-archives

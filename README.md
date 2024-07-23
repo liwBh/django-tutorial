@@ -1295,6 +1295,202 @@ URL: http://localhost:8000/
 Aplicar este tutorial requiere una modificacion de la estructura y codigo actual por lo tanto se creo una rama
 para mantener separado esos cambios. Los cambios se encuentran en la rama ["reusable-apps"](https://github.com/liwBh/django-tutorial/tree/reusable-apps)
 
+- Importancia de la reutilización
+
+Es mucho trabajo diseñar, construir, probar y mantener una aplicación web. Muchos Los proyectos de Python y 
+Django comparten problemas comunes. No sería genial si nosotros ¿podría salvar algo de este trabajo repetido?
+
+- Estructura de una app reutilizable
+```
+polls/
+      __init__.py
+      admin.py
+      apps.py
+      migrations/
+          __init__.py
+          0001_initial.py
+      models.py
+      static/
+          polls/
+              images/
+                  background.png
+              style.css
+      templates/
+          polls/
+              detail.html
+              index.html
+              results.html
+```
+- Instalacion de setuptools
+
+Requiere de la instalacion de ["setuptools"](https://pypi.org/project/setuptools/) para construir nuestro paquete.
+```
+pip install setuptools
+```
+
+- Empaquetando tu aplicación
+
+    1. Primero, cree un directorio principal para el paquete, fuera de su Django proyecto. 
+    Llame a este directorio django-polls.
+    2. Mover el polls directorio en django-polls directorio, y cambiarle el nombre a django_polls.
+    3. Editar django_polls/apps.py para que name se refiere a la nuevo nombre del módulo y agregar 
+    label para dar un nombre corto para la aplicación:
+    ```
+      from django.apps import AppConfig
+    
+    
+      class PollsConfig(AppConfig):
+          default_auto_field = "django.db.models.BigAutoField"
+          name = "django_polls"
+          label = "polls"
+    ```
+    4. Crear un archivo django-polls/README.rst con los siguientes contenidos:
+  ```
+      ============
+      django-polls
+      ============
+      
+      django-polls is a Django app to conduct web-based polls. For each
+      question, visitors can choose between a fixed number of answers.
+      
+      Detailed documentation is in the "docs" directory.
+      
+      Quick start
+      -----------
+      
+      1. Add "polls" to your INSTALLED_APPS setting like this::
+      
+          INSTALLED_APPS = [
+              ...,
+              "django_polls",
+          ]
+      
+         2. Include the polls URLconf in your project urls.py like this::
+      
+             path("polls/", include("django_polls.urls")),
+      
+         3. Run ``python manage.py migrate`` to create the models.
+      
+         4. Start the development server and visit the admin to create a poll.
+      
+         5. Visit the ``/polls/`` URL to participate in the poll.  
+  ```
+  5. Crear un archivo: django-polls/LICENSE  
+  6. Siguiente paso consiste en crear los siguientes archivos: pyproject.toml, setup.cfg, 
+  y setup.py, estos detallan cómo construir e instalar la aplicación. En django-polls/
+
+       - pyproject.toml
+      ```
+        [build-system]
+        requires = ['setuptools>=40.8.0']
+        build-backend = 'setuptools.build_meta'
+      ```
+  
+      - setup.cfg
+      ```
+        [metadata]
+        name = django-polls
+        version = 0.1
+        description = A Django app to conduct web-based polls.
+        long_description = file: README.rst
+        url = https://www.example.com/
+        author = Your Name # Cambiar por tu nombre
+        author_email = yourname@example.com # Cambiar por tu correo
+        license = BSD-3-Clause  # Cambiar por tu lincencia
+        classifiers =
+            Environment :: Web Environment
+            Framework :: Django
+            Framework :: Django :: X.Y  # Cambiar X.Y, Ejemplo 4.0
+            Intended Audience :: Developers
+            License :: OSI Approved :: BSD License
+            Operating System :: OS Independent
+            Programming Language :: Python
+            Programming Language :: Python :: 3
+            Programming Language :: Python :: 3 :: Only
+            Programming Language :: Python :: 3.10
+            Programming Language :: Python :: 3.11
+            Programming Language :: Python :: 3.12
+            Topic :: Internet :: WWW/HTTP
+            Topic :: Internet :: WWW/HTTP :: Dynamic Content
+        
+        [options]
+        include_package_data = true
+        packages = find:
+        python_requires = >=3.10
+        install_requires =
+        Django >= X.Y  # Cambiar X.Y, Ejemplo 4.0
+      ```
+  
+      - setup.py
+       ```
+        from setuptools import setup, find_packages
+      
+         setup(
+               name='django-polls',
+               version='0.1',
+               packages=find_packages(),
+               include_package_data=True,
+               install_requires=[
+                  'Django >= 4.0',
+               ],
+          )
+
+       ```
+  8. Crear un archivo: django-polls/LICENSE
+  9. Crear un archivo: django-polls/MANIFEST.in
+  ```
+    include LICENSE
+    include README.rst
+    recursive-include django_polls/static *
+    recursive-include django_polls/templates *
+    recursive-include docs *
+  ```
+  
+  9. Empaquetar la app
+  ```
+  python3 setup.py sdist
+  ```
+Nota 1: Accedermos al directorio django-polls, `cd django-polls` y ejecutamos el comando `python3 setup.py sdist` 
+dist es una carpeta que se creará dentro de django-polls esta contiene la app empaquetada django-polls-0.1.tar.gz
+
+Nota 2: Este paso debe realizarse fuera del directorio del proyecto. Tambien pip install setuptools debe instalarse global.
+
+Nota 3: Recordar actualizar los valores en el archivo setup.cfg, si no se hace tendra errores
+
+
+![img.png](static/img/img-17.png)
+![img.png](static/img/img-18.png)
+
+- Instalacion del paquete creado
+
+Se debe acceder al directorio donde esta el paquete de la app django-polls-0.1.tar.gz
+```
+  pip install my-directorio/django-polls-0.1.tar.gz
+```
+Nota: Este paquete se instalará dentro de nuestro entorno virtual donde estan todos los paquetes 
+de la app. Cambia `my-directorio` por la ruta donde se encuentra el paquete `django-polls-0.1.tar.gz`
+
+![img.png](static/img/img-19.png)
+
+Nota: Estos paquetes tambien se pueden subir a github o otros similares y installarlos desde ahí
+
+- Configurar la app en el proyecto 
+
+Directorio: mysite/settings.py
+```
+INSTALLED_APPS = [
+    "django_polls.apps.PollsConfig",
+    ...,
+]
+```
+
+Directorio: mysite/urls.py
+```
+urlpatterns = [
+    path("polls/", include("django_polls.urls")),
+    ...,
+]
+```
 
 ## Obtener ayuda de otros
 
