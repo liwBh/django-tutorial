@@ -9,7 +9,11 @@ Es un resumen del ["tutorial oficial"](https://docs.djangoproject.com/en/5.0/) d
 * [Parte 5 Pruebas automatizadas](#parte-5-pruebas-automatizadas)
 * [Parte 6 Archivos estaticos](#parte-6-archivos-estaticos)
 * [Parte 7 Personalizar formulario de administración](#parte-7-personalizar-formulario-de-administración)
+* [Parte 8 Debug Toolbar](#parte-8-debug-toolbar)
+* [Tutorial avanzado: Crear aplicaciones reutilizables](#tutorial-avanzado-crear-aplicaciones-reutilizables)
+* [Obtener ayuda de otro](#obtener-ayuda-de-otros)
 * [Extras](#extras)
+* [Lista de comandos Django](#lista-de-comandos-django)
 
 
 
@@ -1010,7 +1014,6 @@ body {
     background-repeat: no-repeat;
 }
 ```
- 
 
 ## Parte 7 Personalizar panel de administración
 
@@ -1206,6 +1209,79 @@ tambien se puede personalizar otros aspectos
 
 ![img.png](static/img/img-13.png)
 
+## Parte 8 Debug Toolbar
+
+- Instalación de Debug Toolbar
+```
+python -m pip install django-debug-toolbar
+```
+['Documentación'](https://django-debug-toolbar.readthedocs.io/en/latest/installation.html)
+
+- Agregarlo la app en settings
+
+Directorio: mysite/settings.py
+```
+INSTALLED_APPS = [
+    # ...
+    "debug_toolbar",
+]
+```
+
+- Agregarlo en las urls
+
+Directorio: mysite/urls.py
+```
+from django.conf import settings
+from django.conf.urls import include
+from django.urls import path
+
+urlpatterns = [
+    ...
+]
+
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns = [
+        path('__debug__/', include(debug_toolbar.urls)),
+    ] + urlpatterns
+```
+- Agregalor a Middleware
+
+Directorio: mysite/settings.py
+```
+MIDDLEWARE = [
+    # ...
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
+    # ...
+]
+```
+
+- Configuración para solo mostrarlo en entorno de desarrollo
+
+Directorio: mysite/settings.py
+Se puede agregar al final del archivo
+```
+INTERNAL_IPS = [
+    '127.0.0.1:8001',
+]
+```
+
+- Activar modo debug
+![img.png](static/img/img-16.png)
+
+Se activa al darle click al botón del escarabajo 
+
+URL: http://localhost:8000/
+![img.png](static/img/img-15.png)
+
+## Tutorial avanzado: Crear aplicaciones reutilizables
+
+## Obtener ayuda de otros
+
+['Foro de Django'](https://forum.djangoproject.com/)
+
+['Discord de Django'](https://discord.gg/xcRH6mN4fa)
+
 ## Extras
 - Agregar una vista principal
 
@@ -1295,4 +1371,56 @@ body {
     margin: 5px;
 }
 ```
-![img.png](img-14.png)
+![img.png](static/img/img-14.png)
+
+## Lista de comandos Django
+
+1. Crear entorno virtual
+```  
+  python -m venv ./venv
+```
+   
+2.  Activar el entorno virtual
+```
+    python -m venv ./venv/bin/activate
+```
+
+3. Crear un proyecto 
+```   
+    django-admin startproject <my_project>
+```  
+   
+4. Crear una aplicación 
+```   
+    django-admin startapp <my_app>
+```  
+   
+5. Compilar el proyecto 
+```   
+    python manage.py runserver
+``` 
+   
+6. Generar archivo requirements.txt, si no lo tenemos o queremos actualizarlo
+```   
+  pip freeze > requirements.txt
+```  
+   
+7. Install requirements 
+```   
+  pip install -r requirements.txt
+```
+
+8. Crear migraciones 
+```   
+  python manage.py migrate
+```
+
+9. Crear super usuario
+```   
+    python manage.py createsuperuser
+```
+   
+10. Crear archivos estaticos
+```
+   python manage.py collectstatic
+```  
