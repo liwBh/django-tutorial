@@ -1292,6 +1292,10 @@ URL: http://localhost:8000/
 
 ["Tutorial avanzado Django"](https://docs.djangoproject.com/en/5.0/intro/reusable-apps/)
 
+Aplicar este tutorial requiere una modificacion de la estructura y codigo actual por lo tanto se creo una rama
+para mantener separado esos cambios. Los cambios se encuentran en la rama ["reusable-apps"](https://github.com/liwBh/django-tutorial/tree/reusable-apps)
+
+
 ## Obtener ayuda de otros
 
 ['Foro de Django'](https://forum.djangoproject.com/)
