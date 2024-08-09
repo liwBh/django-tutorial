@@ -1442,4 +1442,6 @@ body {
 10. Crear archivos estaticos
 ```
    python manage.py collectstatic
-```  
+```
+
+# Pruebas
